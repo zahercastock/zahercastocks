@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Imprimir Etiquetas QR · ZahercaStocks{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header Toolbar Dark Mode (Hidden in Print) -->
+    <div class="print:hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#111827] p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <div>
+            <h2 class="text-xl font-black text-white brand-font flex items-center gap-2">
+                <i class="fa-solid fa-print text-red-500"></i>
+                <span>Impresión de Etiquetas QR Zaherca</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Etiquetas listas para imprimir y pegar en herramientas, taladros, cajas y maquinaria de obra.</p>
+        </div>
+        <div class="flex items-center gap-2.5">
+            <button onclick="window.print()" class="bg-red-600 hover:bg-red-500 text-white font-bold py-2.5 px-5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-red-600/30 transition-all active:scale-95">
+                <i class="fa-solid fa-print"></i> Mandar a Imprimir
+            </button>
+        </div>
+    </div>
+
+    <!-- Print instructions callout -->
+    <div class="print:hidden bg-gradient-to-r from-[#182235] to-[#250d14] p-4 rounded-2xl border border-red-900/40 text-xs text-slate-300 flex items-start gap-3">
+        <i class="fa-solid fa-lightbulb text-amber-400 text-base mt-0.5"></i>
+        <div>
+            <b class="text-white">Consejo de Impresión:</b> Al imprimir, selecciona tamaño <b>Carta / A4</b> y asegúrate de activar la opción <i>"Gráficos de fondo"</i> en la configuración de la impresora.
+        </div>
+    </div>
+
+    <!-- Printable Grid of Labels -->
+    <div id="print-labels-container" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 print:grid-cols-3 print:gap-3">
+        <div class="col-span-full py-12 text-center text-slate-500">
+            <i class="fa-solid fa-spinner fa-spin text-red-500 text-xl mb-2"></i>
+            <div>Generando etiquetas QR...</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Styles for Print Output -->
+<style>
+    @media print {
+        body { background: white !important; color: black !important; }
+        main { padding: 0 !important; margin: 0 !important; }
+        .no-print { display: none !important; }
+        .qr-label-card {
+            page-break-inside: avoid;
+            border: 2px solid #0f172a !important;
+            background: white !important;
+            color: black !important;
+            box-shadow: none !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    async function loadPrintableQRs() {
+        const container = document.getElementById("print-labels-container");
+        try {
+            const res = await fetch("/api/equipment");
+            const equipments = await res.json();
+
+            if (equipments.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-slate-500">No hay equipos registrados para imprimir.</div>`;
+                return;
+            }
+
+            container.innerHTML = equipments.map(eq => `
+                <div class="qr-label-card bg-white p-4 rounded-2xl border-2 border-slate-300 text-slate-900 flex flex-col items-center text-center justify-between shadow-md">
+                    <div class="w-full flex items-center justify-center gap-1.5 border-b border-slate-200 pb-2 mb-2">
+                        <img src="/static/img/logo.png" alt="Logo" class="h-4 object-contain">
+                        <span class="text-[9px] font-black uppercase tracking-wider text-slate-800">ZAHERCA CONSTRUCCIONES</span>
+                    </div>
+
+                    <img src="/api/equipment/${eq.id}/qr" alt="QR ${eq.code}" class="w-36 h-36 object-contain my-1">
+
+                    <div class="w-full pt-2 border-t border-slate-200 mt-1">
+                        <div class="font-black text-base text-slate-950 tracking-wider">${eq.code}</div>
+                        <div class="text-xs font-bold text-slate-700 truncate max-w-full">${eq.name}</div>
+                        <div class="text-[10px] text-slate-500 font-semibold">${eq.category}</div>
+                    </div>
+                </div>
+            `).join('');
+
+        } catch (e) {
+            container.innerHTML = `<div class="col-span-full text-center py-8 text-rose-500">Error al cargar etiquetas QR.</div>`;
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadPrintableQRs();
+    });
+</script>
+{% endblock %}

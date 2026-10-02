@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#090d16]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión · ZahercaStocks</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 6 Pro CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Montserrat:wght@800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .brand-font {
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: -0.5px;
+        }
+        .glow-red {
+            box-shadow: 0 0 35px -5px rgba(220, 38, 38, 0.35);
+        }
+    </style>
+</head>
+<body class="h-full flex items-center justify-center p-4 selection:bg-red-600 selection:text-white relative overflow-hidden">
+
+    <!-- Decorative background glow -->
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="w-full max-w-md relative z-10 space-y-6">
+        
+        <!-- Brand Header -->
+        <div class="text-center space-y-3">
+            <div class="inline-flex items-center justify-center p-2.5 rounded-2xl bg-white/10 backdrop-blur-md border border-red-500/30 shadow-xl mb-1">
+                <img src="/static/img/logo_transparent.png" alt="Zaherca Logo" class="h-14 w-auto object-contain drop-shadow-md" onerror="this.onerror=null; this.src='/static/img/logo.png'">
+            </div>
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-black text-white brand-font tracking-tight">
+                    Zaherca<span class="text-red-500">Stocks</span>
+                </h1>
+                <p class="text-xs font-semibold uppercase tracking-widest text-red-400 mt-0.5">Control de Inventario y Herramientas</p>
+            </div>
+        </div>
+
+        <!-- Login Card -->
+        <div class="bg-[#111827]/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl glow-red space-y-6">
+            
+            <div class="border-b border-slate-800/80 pb-4 text-center">
+                <h2 class="text-lg font-bold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-shield-halved text-red-500"></i>
+                    <span>Acceso al Sistema</span>
+                </h2>
+                <p class="text-xs text-slate-400 mt-1">Ingresa tus credenciales autorizadas para continuar.</p>
+            </div>
+
+            <!-- Error Banner -->
+            <div id="login-error" class="hidden p-3.5 bg-rose-950/70 border border-rose-800 text-rose-300 text-xs rounded-xl flex items-center gap-2.5 animate-pulse">
+                <i class="fa-solid fa-circle-exclamation text-rose-400 text-base shrink-0"></i>
+                <span id="login-error-text">Usuario o contraseña incorrectos.</span>
+            </div>
+
+            <form id="form-login" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-user text-red-400 text-xs"></i>
+                        <span>Usuario</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="login-username" 
+                        required 
+                        autofocus
+                        placeholder="Ej. adminzaher"
+                        autocomplete="username"
+                        class="w-full bg-[#182235] border border-slate-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all placeholder:text-slate-500 font-medium"
+                    >
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-lock text-red-400 text-xs"></i>
+                            <span>Contraseña</span>
+                        </label>
+                        <button type="button" onclick="togglePasswordVisibility()" class="text-[11px] text-slate-400 hover:text-red-400 font-semibold transition-colors">
+                            <span id="toggle-pw-text">Mostrar</span>
+                        </button>
+                    </div>
+                    <div class="relative">
+                        <input 
+                            type="password" 
+                            id="login-password" 
+                            required 
+                            placeholder="••••••••••••"
+                            autocomplete="current-password"
+                            class="w-full bg-[#182235] border border-slate-700 text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all placeholder:text-slate-500 font-medium pr-10"
+                        >
+                        <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-white transition-colors">
+                            <i id="toggle-pw-icon" class="fa-solid fa-eye text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button 
+                        type="submit" 
+                        id="btn-login-submit"
+                        class="w-full bg-red-600 hover:bg-red-500 text-white font-bold py-3.5 px-4 rounded-xl text-sm shadow-lg shadow-red-600/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer"
+                    >
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span id="btn-login-text">Iniciar Sesión</span>
+                    </button>
+                </div>
+            </form>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-[11px] text-slate-500 space-y-1">
+            <div>Zaherca Construcciones · RIF J-30015660-5</div>
+            <div>Sistema Seguro de Gestión y Trazabilidad Operativa</div>
+        </div>
+
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const input = document.getElementById("login-password");
+            const icon = document.getElementById("toggle-pw-icon");
+            const text = document.getElementById("toggle-pw-text");
+            if (input.type === "password") {
+                input.type = "text";
+                icon.className = "fa-solid fa-eye-slash text-sm";
+                text.textContent = "Ocultar";
+            } else {
+                input.type = "password";
+                icon.className = "fa-solid fa-eye text-sm";
+                text.textContent = "Mostrar";
+            }
+        }
+
+        async function handleLoginSubmit(e) {
+            e.preventDefault();
+            const errDiv = document.getElementById("login-error");
+            const errText = document.getElementById("login-error-text");
+            const btn = document.getElementById("btn-login-submit");
+            const btnText = document.getElementById("btn-login-text");
+
+            errDiv.classList.add("hidden");
+            btn.disabled = true;
+            btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
+
+            const username = document.getElementById("login-username").value.trim();
+            const password = document.getElementById("login-password").value;
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    btnText.innerHTML = '<i class="fa-solid fa-check"></i> Ingresando...';
+                    window.location.href = "/";
+                } else {
+                    errText.textContent = data.detail || "Error al autenticar credenciales.";
+                    errDiv.classList.remove("hidden");
+                    btn.disabled = false;
+                    btnText.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
+                }
+            } catch (error) {
+                errText.textContent = "Error de conexión con el servidor.";
+                errDiv.classList.remove("hidden");
+                btn.disabled = false;
+                btnText.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
+            }
+        }
+    </script>
+</body>
+</html>

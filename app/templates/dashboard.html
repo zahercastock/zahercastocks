@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard · ZahercaStocks{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Top Greeting & Header in Zaherca Dark Theme -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-[#0d1422] via-[#1a1c2e] to-[#250d14] p-6 rounded-3xl text-white shadow-2xl border border-red-900/30 relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="space-y-1.5 relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/60 border border-red-500/40 text-xs font-semibold text-red-300">
+                <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> ZAHERCA CONSTRUCCIONES · SISTEMA ACTIVO
+            </div>
+            <h2 class="text-2xl md:text-3xl font-black tracking-tight brand-font">Panel de Control ZahercaStocks</h2>
+            <p class="text-sm text-slate-300">Monitorea y gestiona en tiempo real las herramientas, equipos y maquinaria de tus obras.</p>
+        </div>
+        <div class="flex flex-wrap gap-2.5 relative z-10">
+            <a href="/scanner" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-amber-500/20 transition-all active:scale-95">
+                <i class="fa-solid fa-camera"></i> Escáner QR
+            </a>
+            <button onclick="openModal('modal-checkout')" class="bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-2.5 rounded-xl text-sm flex items-center gap-2 shadow-lg shadow-red-600/40 transition-all active:scale-95">
+                <i class="fa-solid fa-plus"></i> Prestar Equipo
+            </button>
+        </div>
+    </div>
+
+    <!-- Metrics Cards Grid Dark Mode -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3.5 md:gap-4">
+        <!-- Total Equipos -->
+        <div class="bg-[#111827] p-5 rounded-2xl border border-slate-800 shadow-lg flex flex-col justify-between hover:border-slate-700 transition-all">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Equipos</span>
+                <span class="w-8 h-8 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                </span>
+            </div>
+            <div class="mt-4">
+                <div id="stat-total" class="text-2xl md:text-3xl font-black text-white brand-font">-</div>
+                <p class="text-[11px] text-slate-400 mt-0.5">En catálogo</p>
+            </div>
+        </div>
+
+        <!-- Disponibles -->
+        <div class="bg-[#111827] p-5 rounded-2xl border border-emerald-900/40 bg-gradient-to-b from-[#111827] to-emerald-950/20 shadow-lg flex flex-col justify-between hover:border-emerald-700/50 transition-all">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Disponibles</span>
+                <span class="w-8 h-8 rounded-lg bg-emerald-950/80 text-emerald-400 border border-emerald-800/50 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-check"></i>
+                </span>
+            </div>
+            <div class="mt-4">
+                <div id="stat-available" class="text-2xl md:text-3xl font-black text-emerald-400 brand-font">-</div>
+                <p class="text-[11px] text-emerald-300 mt-0.5">Listos para entrega</p>
+            </div>
+        </div>
+
+        <!-- En Uso / Prestados -->
+        <div class="bg-[#111827] p-5 rounded-2xl border border-blue-900/40 bg-gradient-to-b from-[#111827] to-blue-950/20 shadow-lg flex flex-col justify-between hover:border-blue-700/50 transition-all">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-blue-400">En Uso</span>
+                <span class="w-8 h-8 rounded-lg bg-blue-950/80 text-blue-400 border border-blue-800/50 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-hand-holding-hand"></i>
+                </span>
+            </div>
+            <div class="mt-4">
+                <div id="stat-in-use" class="text-2xl md:text-3xl font-black text-blue-400 brand-font">-</div>
+                <p class="text-[11px] text-blue-300 mt-0.5">En obras y proyectos</p>
+            </div>
+        </div>
+
+        <!-- Atrasados (Alerta Roja) -->
+        <div class="bg-[#111827] p-5 rounded-2xl border border-red-900/50 bg-gradient-to-b from-[#111827] to-red-950/30 shadow-lg flex flex-col justify-between hover:border-red-600/60 transition-all">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-red-400">Atrasados</span>
+                <span class="w-8 h-8 rounded-lg bg-red-950 text-red-400 border border-red-700/60 flex items-center justify-center text-sm animate-pulse">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </span>
+            </div>
+            <div class="mt-4">
+                <div id="stat-overdue" class="text-2xl md:text-3xl font-black text-red-400 brand-font">-</div>
+                <p class="text-[11px] text-red-300 mt-0.5 font-semibold">Requieren reclamo</p>
+            </div>
+        </div>
+
+        <!-- En Mantenimiento -->
+        <div class="col-span-2 md:col-span-1 bg-[#111827] p-5 rounded-2xl border border-amber-900/40 bg-gradient-to-b from-[#111827] to-amber-950/20 shadow-lg flex flex-col justify-between hover:border-amber-700/50 transition-all">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Mantenimiento</span>
+                <span class="w-8 h-8 rounded-lg bg-amber-950/80 text-amber-400 border border-amber-800/50 flex items-center justify-center text-sm">
+                    <i class="fa-solid fa-wrench"></i>
+                </span>
+            </div>
+            <div class="mt-4">
+                <div id="stat-maintenance" class="text-2xl md:text-3xl font-black text-amber-400 brand-font">-</div>
+                <p class="text-[11px] text-amber-300 mt-0.5">En taller / revisión</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid: Active Loans & Categories -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Active Loans Table / Cards (2 columns on LG) -->
+        <div class="lg:col-span-2 bg-[#111827] rounded-2xl border border-slate-800 shadow-xl overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-800/80 flex items-center justify-between bg-[#131b2e]">
+                <div class="flex items-center gap-2.5">
+                    <span class="w-3 h-3 rounded-full bg-red-600 shadow-sm shadow-red-600"></span>
+                    <h3 class="font-bold text-base text-white brand-font">Equipos Prestados y en Taller Actualmente</h3>
+                </div>
+                <a href="/movements" class="text-xs font-semibold text-red-400 hover:text-red-300 flex items-center gap-1">
+                    Ver todos <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <div class="p-4 flex-1 overflow-x-auto">
+                <div id="active-loans-container" class="space-y-3">
+                    <div class="text-center py-8 text-slate-500 text-sm">Cargando préstamos activos...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categories and Quick Inventory Stats (1 column on LG) -->
+        <div class="space-y-6">
+            <!-- Categories breakdown -->
+            <div class="bg-[#111827] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h3 class="font-bold text-sm text-white brand-font">Distribución por Categorías</h3>
+                    <i class="fa-solid fa-layer-group text-red-400"></i>
+                </div>
+                <div id="categories-container" class="space-y-3">
+                    <div class="text-center py-4 text-slate-500 text-xs">Cargando categorías...</div>
+                </div>
+            </div>
+
+            <!-- Quick Export & Reports Card -->
+            <div class="bg-gradient-to-br from-[#161c2d] to-[#250d14] p-5 rounded-2xl text-white border border-red-900/40 shadow-xl space-y-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-red-600/20 text-red-400 flex items-center justify-center text-sm border border-red-500/30">
+                        <i class="fa-solid fa-file-excel"></i>
+                    </div>
+                    <h4 class="font-bold text-sm brand-font">Descargar Reportes Zaherca</h4>
+                </div>
+                <p class="text-xs text-slate-300">Exporta el inventario valorado o el historial de salidas a Excel (CSV).</p>
+                <div class="flex flex-col gap-2 pt-1">
+                    <a href="/api/export/csv?type=equipment" class="w-full bg-slate-900/90 hover:bg-slate-800 text-white text-xs font-semibold py-2 px-3 rounded-xl flex items-center justify-between border border-slate-700 transition-all">
+                        <span>Reporte de Inventario</span>
+                        <i class="fa-solid fa-download text-red-400"></i>
+                    </a>
+                    <a href="/api/export/csv?type=movements" class="w-full bg-slate-900/90 hover:bg-slate-800 text-white text-xs font-semibold py-2 px-3 rounded-xl flex items-center justify-between border border-slate-700 transition-all">
+                        <span>Historial de Movimientos</span>
+                        <i class="fa-solid fa-download text-red-400"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Timeline -->
+    <div class="bg-[#111827] rounded-2xl border border-slate-800 shadow-xl p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-clock-rotate-left text-red-500"></i>
+                <h3 class="font-bold text-base text-white brand-font">Auditoría y Movimientos Recientes</h3>
+            </div>
+            <a href="/movements" class="text-xs font-semibold text-red-400 hover:text-red-300">Ver todo el historial</a>
+        </div>
+        <div id="recent-activity-container" class="space-y-3">
+            <div class="text-center py-6 text-slate-500 text-sm">Cargando actividad...</div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadDashboardStats();
+    });
+</script>
+{% endblock %}

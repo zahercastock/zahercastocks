@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios · ZahercaStocks{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header Toolbar Dark Mode -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#111827] p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <div>
+            <h2 class="text-xl font-black text-white brand-font flex items-center gap-2">
+                <i class="fa-solid fa-users-gear text-red-500"></i>
+                <span>Gestión de Usuarios y Accesos</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Control de cuentas de acceso, asignación de roles y restablecimiento de contraseñas (Solo Administrador).</p>
+        </div>
+        <button onclick="openCreateUserModal()" class="bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-red-600/30 flex items-center gap-2 transition-all active:scale-95 shrink-0">
+            <i class="fa-solid fa-user-plus"></i> Nuevo Usuario
+        </button>
+    </div>
+
+    <!-- Users Table Card -->
+    <div class="bg-[#111827] rounded-2xl border border-slate-800 shadow-xl overflow-hidden">
+        <div class="p-4 border-b border-slate-800 bg-[#0d1422] flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                <i class="fa-solid fa-address-card text-red-400 mr-1.5"></i> Cuentas Registradas en el Sistema
+            </span>
+            <button onclick="loadUsersList()" class="text-xs text-slate-400 hover:text-white font-semibold transition-colors flex items-center gap-1">
+                <i class="fa-solid fa-rotate text-red-400"></i> Actualizar
+            </button>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-800 bg-[#131b2e] text-[11px] font-black uppercase tracking-wider text-slate-400">
+                        <th class="py-3.5 px-4">Usuario</th>
+                        <th class="py-3.5 px-4">Nombre Completo</th>
+                        <th class="py-3.5 px-4">Rol / Permisos</th>
+                        <th class="py-3.5 px-4">Estado</th>
+                        <th class="py-3.5 px-4">Fecha de Creación</th>
+                        <th class="py-3.5 px-4 text-right">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body" class="divide-y divide-slate-800 text-sm">
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-slate-500">
+                            <i class="fa-solid fa-spinner fa-spin text-red-500 text-xl mb-2"></i>
+                            <div>Cargando usuarios...</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- MODAL CREAR / EDITAR USUARIO -->
+<div id="modal-user" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+    <div class="bg-[#111827] border border-slate-800 rounded-3xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4 text-white flex items-center justify-between shadow-md">
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-user-shield text-xl"></i>
+                <h3 id="modal-user-title" class="font-black text-lg brand-font">Nuevo Usuario</h3>
+            </div>
+            <button onclick="closeModal('modal-user')" class="text-white/80 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form id="form-user" onsubmit="submitUserForm(event)" class="p-6 space-y-4 overflow-y-auto">
+            <input type="hidden" id="user-edit-id" value="">
+
+            <div class="space-y-1">
+                <label class="text-xs font-bold text-slate-300">Nombre de Usuario *</label>
+                <input type="text" id="user-username" required placeholder="Ej. operador1" class="w-full bg-[#182235] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-red-500 font-mono">
+                <p class="text-[10px] text-slate-500">Solo letras, números y guiones. Sin espacios.</p>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-bold text-slate-300">Nombre Completo o Área</label>
+                <input type="text" id="user-fullname" placeholder="Ej. Juan Pérez - Almacén Planta" class="w-full bg-[#182235] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-red-500">
+            </div>
+
+            <div class="space-y-1" id="user-password-container">
+                <label id="user-password-label" class="text-xs font-bold text-slate-300">Contraseña *</label>
+                <input type="password" id="user-password" required placeholder="••••••••" class="w-full bg-[#182235] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-red-500">
+                <p id="user-password-hint" class="text-[10px] text-slate-500 hidden">Dejar en blanco si deseas mantener la contraseña actual.</p>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-bold text-slate-300">Rol en el Sistema *</label>
+                <select id="user-role" class="w-full bg-[#182235] border border-slate-700 text-white rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-red-500">
+                    <option value="operador">🔧 Operador (Préstamos, Inventario, Devoluciones, QR)</option>
+                    <option value="admin">👑 Administrador (Acceso total y Gestión de Usuarios)</option>
+                </select>
+            </div>
+
+            <div id="user-status-container" class="hidden items-center gap-2 pt-2">
+                <input type="checkbox" id="user-active" checked class="w-4 h-4 rounded text-red-600 bg-[#182235] border-slate-700 focus:ring-red-500">
+                <label for="user-active" class="text-xs font-bold text-slate-300 cursor-pointer">Cuenta de usuario activa</label>
+            </div>
+
+            <div class="pt-4 flex items-center justify-end gap-2 border-t border-slate-800">
+                <button type="button" onclick="closeModal('modal-user')" class="px-4 py-2.5 rounded-xl border border-slate-700 text-slate-300 text-xs font-bold hover:bg-slate-800 transition-all">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold shadow-lg shadow-red-600/30 transition-all">
+                    Guardar Usuario
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadUsersList();
+    });
+</script>
+{% endblock %}

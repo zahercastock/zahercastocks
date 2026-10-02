@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Préstamos y Movimientos · ZahercaStocks{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- Header Toolbar Dark Mode -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#111827] p-5 rounded-2xl border border-slate-800 shadow-xl">
+        <div>
+            <h2 class="text-xl font-black text-white brand-font flex items-center gap-2">
+                <i class="fa-solid fa-arrow-right-arrow-left text-red-500"></i>
+                <span>Historial de Préstamos, Salidas y Devoluciones</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-0.5">Control de técnicos responsables, obras asignadas, fechas límite y retornos de taller.</p>
+        </div>
+        <button onclick="openModal('modal-checkout')" class="bg-red-600 hover:bg-red-500 text-white text-xs font-bold py-2.5 px-4 rounded-xl shadow-lg shadow-red-600/30 flex items-center gap-2 transition-all active:scale-95 shrink-0">
+            <i class="fa-solid fa-plus"></i> Nueva Salida
+        </button>
+    </div>
+
+    <!-- Movements Navigation Tabs Dark Mode -->
+    <div class="bg-[#111827] rounded-2xl border border-slate-800 shadow-xl overflow-hidden">
+        <div class="flex border-b border-slate-800 bg-[#0d1422] px-4 overflow-x-auto">
+            <button id="tab-btn-ACTIVO" onclick="switchMovementsTab('ACTIVO')" class="px-4 py-3 text-xs sm:text-sm font-bold border-b-2 border-red-500 text-red-400 flex items-center gap-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-hand-holding-hand"></i> Salidas Activas (En Uso / Taller)
+            </button>
+            <button id="tab-btn-ATRASADO" onclick="switchMovementsTab('ATRASADO')" class="px-4 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-triangle-exclamation text-rose-500"></i> ¡Atrasados!
+            </button>
+            <button id="tab-btn-ALL" onclick="switchMovementsTab('ALL')" class="px-4 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap transition-all">
+                <i class="fa-solid fa-clock-rotate-left"></i> Historial Completo
+            </button>
+        </div>
+
+        <!-- Movements Table -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-800 bg-[#131b2e] text-[11px] font-black uppercase tracking-wider text-slate-400">
+                        <th class="py-3.5 px-4">Equipo / Código</th>
+                        <th class="py-3.5 px-4">Empleado / Técnico</th>
+                        <th class="py-3.5 px-4">Proyecto / Taller</th>
+                        <th class="py-3.5 px-4">Fecha Salida</th>
+                        <th class="py-3.5 px-4">Fecha Retorno / Límite</th>
+                        <th class="py-3.5 px-4">Estado</th>
+                        <th class="py-3.5 px-4 text-right">Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="movements-table-body" class="divide-y divide-slate-800 text-sm">
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-slate-500">
+                            <i class="fa-solid fa-spinner fa-spin text-red-500 text-xl mb-2"></i>
+                            <div>Cargando movimientos...</div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        loadMovements("ACTIVO");
+    });
+</script>
+{% endblock %}
